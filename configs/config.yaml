@@ -1,0 +1,9 @@
+port: 8020
+address: localhost
+token-key: key
+database-port: 5432
+database-address: localhost
+database-user: admin
+database-password: pass
+database-name: messenger-db
+
