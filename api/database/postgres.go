@@ -3,12 +3,16 @@ package database
 import (
 	"TeleEcho/configs"
 	"TeleEcho/model"
+	"errors"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
+var NotFoundUser = errors.New("user not found")
+var UnauthorizedChatAccess = errors.New("unauthorized access to the chat")
+var IncorrectPassword = errors.New("incorrect password")
 
 func ConnectDB() error {
 	var err error
@@ -21,7 +25,7 @@ func ConnectDB() error {
 	}
 	logrus.Printf("Connected to database successfully.\n")
 	err = DB.AutoMigrate(&model.User{})
-	//err = DB.AutoMigrate(&model.Contact{})
+	err = DB.AutoMigrate(&model.Contact{})
 	err = DB.AutoMigrate(&model.Group{})
 	err = DB.AutoMigrate(&model.UserGroup{})
 	err = DB.AutoMigrate(&model.DirectChat{})
@@ -53,4 +57,26 @@ func IsUsernameDuplicate(username string) bool {
 		return false
 	}
 	return true
+}
+func IsPhoneDuplicate(phoneNumber string) bool {
+	var count int64
+	DB.Model(&model.User{}).Where("phone = ?", phoneNumber).Count(&count)
+	if count > 0 {
+		return false
+	}
+	return true
+}
+func CheckPassword(username string, hashedPassword string) (*model.User, error) {
+	var user model.User
+	result := DB.Where("username = ?", username).First(&user)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, NotFoundUser
+		}
+		return nil, result.Error
+	}
+	if hashedPassword != user.Password {
+		return nil, IncorrectPassword
+	}
+	return &user, nil
 }

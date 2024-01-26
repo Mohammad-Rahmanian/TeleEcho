@@ -9,6 +9,8 @@ import (
 func New() *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.Recover())
-	e.POST("/register", handlers.RegisterUser)
+	userGroup := e.Group("/user")
+	userGroup.POST("/register", handlers.RegisterUser)
+	userGroup.POST("/login", handlers.Login)
 	return e
 }
