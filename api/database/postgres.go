@@ -19,8 +19,9 @@ func ConnectDB() error {
 		logrus.Printf("Failed to connect to database:%s", err)
 		return err
 	}
+	logrus.Printf("Connected to database successfully.\n")
 	err = DB.AutoMigrate(&model.User{})
-	err = DB.AutoMigrate(&model.Contact{})
+	//err = DB.AutoMigrate(&model.Contact{})
 	err = DB.AutoMigrate(&model.Group{})
 	err = DB.AutoMigrate(&model.UserGroup{})
 	err = DB.AutoMigrate(&model.DirectChat{})
@@ -44,4 +45,12 @@ func CreateUser(username, firstname, lastname, phone, password, profilePicture, 
 	logrus.Printf("User created\n")
 	return nil
 
+}
+func IsUsernameDuplicate(username string) bool {
+	var count int64
+	DB.Model(&model.User{}).Where("username = ?", username).Count(&count)
+	if count > 0 {
+		return false
+	}
+	return true
 }

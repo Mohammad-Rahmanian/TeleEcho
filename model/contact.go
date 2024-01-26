@@ -1,9 +1,9 @@
 package model
 
 type Status struct {
-	profilePictureHide bool
-	phoneNumberHide    bool
-	isBlocked          bool
+	ProfilePictureHide bool `json:"ProfilePictureHide"`
+	PhoneNumberHide    bool `json:"phoneNumberHide"`
+	IsBlocked          bool `json:"isBlocked"`
 }
 
 type Contact struct {
