@@ -1,11 +1,18 @@
 package model
 
-type Contact struct {
-	UserID      uint   `json:"userID" gorm:"primary_key"`
-	ContactID   uint   `json:"contactID" gorm:"primary_key"`
-	ContactName string `json:"contactName,omitempty"`
+type Status struct {
+	profilePictureHide bool
+	phoneNumberHide    bool
+	isBlocked          bool
 }
 
-func NewContact(userID, contactID uint, contactName string) *Contact {
-	return &Contact{UserID: userID, ContactID: contactID, ContactName: contactName}
+type Contact struct {
+	ID            uint   `json:"id" gorm:"primary_key;auto_increment;<-:create"`
+	UserID        uint   `json:"userID" gorm:"foreignKey;not null"`
+	ContactUserID uint   `json:"contactUserID" gorm:"foreignKey;not null"`
+	Status        Status `json:"status"`
+}
+
+func NewContact(id, userID, contactUserID uint, status Status) *Contact {
+	return &Contact{ID: id, UserID: userID, ContactUserID: contactUserID, Status: status}
 }
